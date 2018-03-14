@@ -34,7 +34,9 @@ class Application : public EventCallbacks
 
         // Our shader program
         std::shared_ptr<Program> prog;
+        std::shared_ptr<Program> NefProg;
 
+        std::shared_ptr<Shape> shape;
         std::vector<std::shared_ptr<Particle>> particles;
 
         // CPU array for particles - redundant with particle structure
@@ -64,6 +66,8 @@ class Application : public EventCallbacks
         glm::vec3 g = glm::vec3(0.0f, -0.01f, 0.0f);
 
         float camRot = 0;
+
+        const vec3 light = vec3(-3, 2, 2);
 
 
         void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -141,6 +145,24 @@ class Application : public EventCallbacks
             prog->addUniform("M");
             prog->addUniform("alphaTexture");
             prog->addAttribute("vertPos");
+
+            NefProg = make_shared<Program>();
+            NefProg->setVerbose(true);
+            NefProg->setShaderNames(resourceDirectory + "/phong_vert.glsl", resourceDirectory + "/phong_frag.glsl");
+            if (NefProg->init()) {
+                //exit(1);
+            }
+            NefProg->addUniform("P");
+            NefProg->addUniform("V");
+            NefProg->addUniform("M");
+            NefProg->addUniform("uMesh");
+            NefProg->addUniform("uLight");
+            NefProg->addUniform("MatAmb");
+            NefProg->addUniform("MatDif");
+            NefProg->addUniform("MatSpec");
+            NefProg->addUniform("shine");
+            NefProg->addAttribute("vertPos");
+            NefProg->addAttribute("vertNor");
         }
 
         // Code to load in the three textures
@@ -183,6 +205,11 @@ class Application : public EventCallbacks
             CHECKED_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, colorbuffer));
             // actually memcopy the data - only do this once
             CHECKED_GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(pointColors), NULL, GL_STREAM_DRAW));
+
+            shape = make_shared<Shape>();
+            shape->loadMesh(resourceDirectory + "/Nefertiti-10K.obj");
+            shape->resize();
+            shape->init();
         }
 
         // Note you could add scale later for each particle - not implemented
@@ -268,7 +295,23 @@ class Application : public EventCallbacks
 
 
             // Draw
+            NefProg->bind();
+            glUniformMatrix4fv(NefProg->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));
+            glUniform3f(NefProg->getUniform("uLight"), (float)light.x, (float)light.y, (float)light.z);
+
+            glUniformMatrix4fv(NefProg->getUniform("V"), 1, GL_FALSE, value_ptr(V->topMatrix()));
+            glUniformMatrix4fv(NefProg->getUniform("M"), 1, GL_FALSE,value_ptr(M->topMatrix()) );
+
+            glUniform3f(NefProg->getUniform("MatAmb"), 0.3294f, 0.2235f, 0.02745f);
+            glUniform3f(NefProg->getUniform("MatDif"), 0.75164f, 0.60648f, 0.22648f);
+            glUniform3f(NefProg->getUniform("MatSpec"), 0.628281f, 0.555802f, 0.366065f);
+            glUniform1f(NefProg->getUniform("shine"), 0.4);
+            shape->draw(NefProg);
+
+            NefProg->unbind();
+
             prog->bind();
+
             updateParticles();
             updateGeom();
 
