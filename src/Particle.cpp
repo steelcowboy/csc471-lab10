@@ -32,27 +32,31 @@ void Particle::rebirth(float t)
     x.x = 0;
     x.y = 0;
     x.z = randFloat(-3.f, -2.f);
-    v.x = randFloat(-0.1f, 0.1f);
+    v.x = randFloat(-0.05f, 0.3f);
     v.y = randFloat(-0.1f, 0.1f);
     v.z = randFloat(-0.1f, 0.1f);
     lifespan = randFloat(100.f, 200.f);
     tEnd = t + lifespan;
 
     scale = randFloat(0.2f, 1.0f);
-    color.r = randFloat(0.0f, 0.1f);
-    color.g = randFloat(0.0f, 0.1f);
-    color.b = randFloat(0.25f, 0.5f);
+    color.r = randFloat(0.9f, 0.95f);
+    color.g = randFloat(0.9f, 0.95f);
+    color.b = randFloat(0.5f, 0.7f);
     color.a = 1.0f;
 }
 
 void Particle::update(float t, float h, const vec3 &g, const bool *keyToggles)
 {
-    if (abs(max(x.y, x.x)) > 1.0)
+    float progress = max(abs(x.x), abs(x.y));
+
+    if (progress > 1.0)
     {
         rebirth(t);
     }
 
     // very simple update
     x += h * v;
-    color.a = (tEnd - t) / lifespan;
+    x.y += h * progress * -0.3;
+    //color.a = (tEnd - t) / lifespan;
+    color.a = 1.0 - progress; 
 }

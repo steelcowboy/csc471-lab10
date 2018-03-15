@@ -67,7 +67,7 @@ class Application : public EventCallbacks
 
         float camRot = 0;
 
-        const vec3 light = vec3(-3, 2, 2);
+        const vec3 light = vec3(-5, 5, 2);
 
 
         void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
