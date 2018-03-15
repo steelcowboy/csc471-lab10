@@ -296,17 +296,27 @@ class Application : public EventCallbacks
 
             // Draw
             NefProg->bind();
-            glUniformMatrix4fv(NefProg->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));
-            glUniform3f(NefProg->getUniform("uLight"), (float)light.x, (float)light.y, (float)light.z);
+            M->pushMatrix();
+            {
+                M->translate(vec3(0, 0, -5));
+                M->rotate(radians(-90.f), vec3(1, 0, 0));
+                glUniformMatrix4fv(NefProg->getUniform("M"), 1, GL_FALSE,value_ptr(M->topMatrix()) );
+                glUniformMatrix4fv(NefProg->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));
+                glUniform3f(NefProg->getUniform("uLight"), (float)light.x, (float)light.y, (float)light.z);
 
-            glUniformMatrix4fv(NefProg->getUniform("V"), 1, GL_FALSE, value_ptr(V->topMatrix()));
-            glUniformMatrix4fv(NefProg->getUniform("M"), 1, GL_FALSE,value_ptr(M->topMatrix()) );
+                glUniformMatrix4fv(NefProg->getUniform("V"), 1, GL_FALSE, value_ptr(V->topMatrix()));
 
-            glUniform3f(NefProg->getUniform("MatAmb"), 0.3294f, 0.2235f, 0.02745f);
-            glUniform3f(NefProg->getUniform("MatDif"), 0.75164f, 0.60648f, 0.22648f);
-            glUniform3f(NefProg->getUniform("MatSpec"), 0.628281f, 0.555802f, 0.366065f);
-            glUniform1f(NefProg->getUniform("shine"), 0.4);
-            shape->draw(NefProg);
+                //glUniform3f(NefProg->getUniform("MatAmb"), 0.3294f, 0.2235f, 0.02745f);
+                //glUniform3f(NefProg->getUniform("MatDif"), 0.75164f, 0.60648f, 0.22648f);
+                //glUniform3f(NefProg->getUniform("MatSpec"), 0.628281f, 0.555802f, 0.366065f);
+                //glUniform1f(NefProg->getUniform("shine"), 0.4);
+                glUniform3f(NefProg->getUniform("MatAmb"), 0.3294f, 0.2235f, 0.02745f);
+                glUniform3f(NefProg->getUniform("MatDif"), 0.7804f, 0.5686f, 0.11373f);
+                glUniform3f(NefProg->getUniform("MatSpec"), 0.9922, 0.941176, 0.80784);
+                glUniform1f(NefProg->getUniform("shine"), 27.9);
+                shape->draw(NefProg);
+            }
+            M->popMatrix();
 
             NefProg->unbind();
 
