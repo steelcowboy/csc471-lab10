@@ -125,10 +125,12 @@ class Application : public EventCallbacks
 
             // Enable z-buffer test.
             CHECKED_GL_CALL(glEnable(GL_DEPTH_TEST));
+
+            // Enable alpha blending
             CHECKED_GL_CALL(glEnable(GL_BLEND));
             CHECKED_GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
             CHECKED_GL_CALL(glPointSize(14.0f));
-
+            
             // Initialize the GLSL program.
             prog = make_shared<Program>();
             prog->setVerbose(true);
@@ -298,7 +300,7 @@ class Application : public EventCallbacks
             NefProg->bind();
             M->pushMatrix();
             {
-                M->translate(vec3(0, 0, -5));
+                M->translate(vec3(0, 0, -2.2));
                 M->rotate(radians(-90.f), vec3(1, 0, 0));
                 glUniformMatrix4fv(NefProg->getUniform("M"), 1, GL_FALSE,value_ptr(M->topMatrix()) );
                 glUniformMatrix4fv(NefProg->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));

@@ -47,7 +47,7 @@ void Particle::rebirth(float t)
 
 void Particle::update(float t, float h, const vec3 &g, const bool *keyToggles)
 {
-    if (t > tEnd)
+    if (abs(max(x.y, x.x)) > 1.0)
     {
         rebirth(t);
     }
